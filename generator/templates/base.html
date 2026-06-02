@@ -1,0 +1,26 @@
+{{define "base"}}<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{{block "title" .}}Tasks{{end}}</title>
+	<style>
+		body { font-family: system-ui, sans-serif; max-width: 640px; margin: 2rem auto; padding: 0 1rem; }
+		h1 { margin-bottom: 1rem; }
+		ul.tasks { list-style: none; padding: 0; }
+		li.task { border: 1px solid #ddd; border-radius: 8px; padding: .75rem 1rem; margin-bottom: .5rem; }
+		li.task.done .name { text-decoration: line-through; color: #888; }
+		.name { font-weight: 600; }
+		.desc { color: #555; font-size: .9rem; }
+		.meta { color: #999; font-size: .75rem; margin-top: .25rem; }
+		.status { float: right; font-size: .8rem; }
+		.status.done { color: #2a9d2a; }
+		.status.pending { color: #c87f0a; }
+		form.inline { display: inline; }
+		.empty { color: #777; font-style: italic; }
+	</style>
+</head>
+<body>
+	{{template "content" .}}
+</body>
+</html>{{end}}

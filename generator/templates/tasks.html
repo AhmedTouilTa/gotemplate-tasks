@@ -1,0 +1,17 @@
+{{define "content"}}
+<h1>Tasks</h1>
+
+<form  method="post" action="/add-task">
+	<input type="text" name="Name" placeholder="Task name" required>
+	<input type="text" name="Description" placeholder="Description">
+	<button type="submit">Add</button>
+</form>
+
+{{if .Tasks}}
+<ul class="tasks">
+	{{range .Tasks}}{{template "task" .}}{{end}}
+</ul>
+{{else}}
+<p class="empty">No tasks yet — add one above.</p>
+{{end}}
+{{end}}

@@ -1,23 +1,19 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
 	_ "github.com/mattn/go-sqlite3"
-)
 
-type Task struct {
-	gorm.Model
-	Name        string
-	Description string
-	Done        bool
-}
+	"gotemplates/todo/generator"
+	"gotemplates/todo/models"
+)
 
 func main() {
 
@@ -28,33 +24,32 @@ func main() {
 		return
 	}
 
-	db.AutoMigrate(&Task{})
+	db.AutoMigrate(&models.Task{})
 
 	// Create a Gin router with default middleware (logger and recovery)
 	r := gin.Default()
 
 	r.GET("/tasks", func(ctx *gin.Context) {
-		tasks, err := gorm.G[Task](db).Find(ctx)
+		tasks, err := gorm.G[models.Task](db).Find(ctx)
 
 		if err != nil {
 			log.Printf("could not get tasks %s", err.Error())
 			return
 		}
 
-		retval, err := json.Marshal(tasks)
+		// retval, err := json.Marshal(tasks)
 
-		if err != nil {
-			log.Printf("marshall tasks %s", err.Error())
-			return
-		}
-
-		ctx.JSON(http.StatusOK, string(retval))
+		// if err != nil {
+		// 	log.Printf("marshall tasks %s", err.Error())
+		// 	return
+		// }
+		ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte(generator.Tasks(tasks)))
 	})
 
 	r.GET("/task", func(ctx *gin.Context) {
 		id := ctx.Query("id")
 
-		task, err := gorm.G[Task](db).Where("id = ?", id).First(ctx)
+		_, err := gorm.G[models.Task](db).Where("id = ?", id).First(ctx)
 
 		if err != nil {
 			log.Printf("could not get task %s", err.Error())
@@ -62,37 +57,47 @@ func main() {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, task)
+		tasks, err := gorm.G[models.Task](db).Find(ctx)
+		if err != nil {
+			log.Printf("could not get tasks %s", err.Error())
+			return
+		}
+		ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte(generator.Tasks(tasks)))
 	})
 
 	r.POST("/add-task", func(ctx *gin.Context) {
-		var task Task
+		var task models.Task
 
-		if err := ctx.ShouldBindJSON(&task); err != nil {
+		if err := ctx.ShouldBindWith(&task, binding.Form); err != nil {
 			log.Printf("could not bind task %s", err.Error())
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		if err := gorm.G[Task](db).Create(ctx, &task); err != nil {
+		if err := gorm.G[models.Task](db).Create(ctx, &task); err != nil {
 			log.Printf("could not create task %s", err.Error())
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "could not create task"})
 			return
 		}
 
-		ctx.JSON(http.StatusCreated, task)
+		tasks, err := gorm.G[models.Task](db).Find(ctx)
+		if err != nil {
+			log.Printf("could not get tasks %s", err.Error())
+			return
+		}
+		ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte(generator.Tasks(tasks)))
 	})
 
 	r.POST("/update-task", func(ctx *gin.Context) {
-		var task Task
+		var task models.Task
 
-		if err := ctx.ShouldBindJSON(&task); err != nil {
+		if err := ctx.ShouldBindWith(&task, binding.Form); err != nil {
 			log.Printf("could not bind task %s", err.Error())
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		rows, err := gorm.G[Task](db).Where("id = ?", task.ID).Updates(ctx, task)
+		rows, err := gorm.G[models.Task](db).Where("id = ?", task.ID).Updates(ctx, task)
 
 		if err != nil {
 			log.Printf("could not update task %s", err.Error())
@@ -105,13 +110,18 @@ func main() {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, task)
+		tasks, err := gorm.G[models.Task](db).Find(ctx)
+		if err != nil {
+			log.Printf("could not get tasks %s", err.Error())
+			return
+		}
+		ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte(generator.Tasks(tasks)))
 	})
 
 	r.POST("/delete-task", func(ctx *gin.Context) {
 		id := ctx.Query("id")
 
-		rows, err := gorm.G[Task](db).Where("id = ?", id).Delete(ctx)
+		rows, err := gorm.G[models.Task](db).Where("id = ?", id).Delete(ctx)
 
 		if err != nil {
 			log.Printf("could not delete task %s", err.Error())
@@ -124,7 +134,12 @@ func main() {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, gin.H{"deleted": id})
+		tasks, err := gorm.G[models.Task](db).Find(ctx)
+		if err != nil {
+			log.Printf("could not get tasks %s", err.Error())
+			return
+		}
+		ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte(generator.Tasks(tasks)))
 	})
 
 	// Start server on port 8080 (default)
