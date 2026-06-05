@@ -2,7 +2,7 @@ package generator
 
 import (
 	_ "embed"
-	"gotemplates/todo/models"
+	"gotemplates/todo/db/todoapp"
 )
 
 var (
@@ -15,7 +15,7 @@ var (
 )
 
 type TasksPage struct {
-	Tasks []models.Task
+	Tasks []todoapp.Task
 }
 
 // TemplateText is the root template. base.html/tasks.html/task.html only

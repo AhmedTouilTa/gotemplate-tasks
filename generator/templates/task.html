@@ -3,7 +3,6 @@
 	<span class="status {{if .Done}}done{{else}}pending{{end}}">{{if .Done}}✓ done{{else}}○ pending{{end}}</span>
 	<div class="name">{{.Name}}</div>
 	{{if .Description}}<div class="desc">{{.Description}}</div>{{end}}
-	<div class="meta">#{{.ID}} · created {{.CreatedAt.Format "2006-01-02 15:04"}}</div>
 	<form class="inline" method="post" action="/update-task">
 		<input type="hidden" name="ID" value="{{.ID}}">
 		<input type="hidden" name="Done" value="{{if .Done}}false{{else}}true{{end}}">
