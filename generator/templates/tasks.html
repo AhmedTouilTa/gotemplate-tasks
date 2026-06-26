@@ -15,6 +15,9 @@
 	{{range .Tasks}}{{template "task" .}}{{end}}
 </ul>
 {{else}}
+<ul id="tasks-list" class="tasks" 
+      hx-on::after-request="this.reset()">
+</ul>
 <p class="empty">No tasks yet — add one above.</p>
 {{end}}
 {{end}}

@@ -152,8 +152,6 @@ func main() {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "could not delete task"})
 			return
 		}
-
-		FetchAndRenderTasks(ctx, queries)
 	})
 
 	// Start server on port 8080 (default)

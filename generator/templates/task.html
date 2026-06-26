@@ -1,5 +1,5 @@
 {{define "task"}}
-<li class="task{{if .Done}} done{{end}}">
+<li id="task-{{.ID}}" class="task{{if .Done}} done{{end}}">
 	<span class="status {{if .Done}}done{{else}}pending{{end}}">{{if .Done}}✓ done{{else}}○ pending{{end}}</span>
 	<div class="name">{{.Name}}</div>
 	{{if .Description}}<div class="desc">{{.Description}}</div>{{end}}
@@ -8,7 +8,7 @@
 		<input type="hidden" name="Done" value="{{if .Done}}false{{else}}true{{end}}">
 		<button type="submit">{{if .Done}}Mark pending{{else}}Mark done{{end}}</button>
 	</form>
-	<form class="inline" method="post" action="/delete-task?id={{.ID}}">
+	<form class="inline" hx-post="/delete-task?id={{.ID}}" hx-swap="delete" hx-target="#task-{{.ID}}">
 		<button type="submit">Delete</button>
 	</form>
 </li>

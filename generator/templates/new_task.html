@@ -1,6 +1,6 @@
 {{define "content"}}
 	{{if ".Task"}}
-	<li class="task{{if .Task.Done}} done{{end}}">
+	<li id="task-{{.Task.ID}}" class="task{{if .Task.Done}} done{{end}}">
 		<span class="status {{if .Task.Done}}done{{else}}pending{{end}}">{{if .Task.Done}}✓ done{{else}}○ pending{{end}}</span>
 		<div class="name">{{.Task.Name}}</div>
 		{{if .Task.Description}}<div class="desc">{{.Task.Description}}</div>{{end}}
@@ -9,7 +9,7 @@
 			<input type="hidden" name="Done" value="{{if .Task.Done}}false{{else}}true{{end}}">
 			<button type="submit">{{if .Task.Done}}Mark pending{{else}}Mark done{{end}}</button>
 		</form>
-		<form class="inline" method="post" action="/delete-task?id={{.Task.ID}}">
+		<form class="inline" hx-post="/delete-task?id={{.Task.ID}}" hx-swap="delete" hx-target="#task-{{.Task.ID}}">
 			<button type="submit">Delete</button>
 		</form>
 	</li>
