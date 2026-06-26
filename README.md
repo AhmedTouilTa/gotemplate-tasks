@@ -35,6 +35,10 @@ Flags:
 
 Running with no schema change writes nothing and reports "no changes".
 
+To **apply** the generated migrations to a database, see
+[docs/running-migrations.md](docs/running-migrations.md) — note the Homebrew
+`migrate` binary lacks a SQLite driver and won't work.
+
 ### Engines
 
 - **SQLite** — works out of the box. Diffing runs against an in-memory SQLite

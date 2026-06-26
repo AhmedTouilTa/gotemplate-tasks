@@ -1,14 +1,17 @@
 {{define "content"}}
 <h1>Tasks</h1>
 
-<form  method="post" action="/add-task">
+<form hx-post="/add-task" 
+		hx-target="#tasks-list" 
+      hx-swap="beforebegin">
 	<input type="text" name="Name" placeholder="Task name" required>
 	<input type="text" name="Description" placeholder="Description">
 	<button type="submit">Add</button>
 </form>
 
 {{if .Tasks}}
-<ul class="tasks">
+<ul id="tasks-list" class="tasks" 
+      hx-on::after-request="this.reset()">
 	{{range .Tasks}}{{template "task" .}}{{end}}
 </ul>
 {{else}}

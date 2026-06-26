@@ -6,6 +6,7 @@ require (
 	ariga.io/atlas v1.2.2
 	github.com/gin-gonic/gin v1.12.0
 	github.com/goccy/go-yaml v1.19.2
+	github.com/mattn/go-sqlite3 v1.14.28
 	github.com/tylermmorton/tmpl v1.1.0
 	gorm.io/gorm v1.31.1
 	modernc.org/sqlite v1.51.0

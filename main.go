@@ -21,6 +21,9 @@ import (
 //go:embed db/schema.sql
 var ddl string
 
+//go:embed generator/templates/base.html
+var homePage string
+
 func main() {
 	gctx := context.Background()
 
@@ -40,6 +43,16 @@ func main() {
 
 	// Create a Gin router with default middleware (logger and recovery)
 	r := gin.Default()
+
+	r.GET("/", func(ctx *gin.Context) {
+		// retval, err := json.Marshal(tasks)
+
+		// if err != nil {
+		// 	log.Printf("marshall tasks %s", err.Error())
+		// 	return
+		// }
+		FetchAndRenderHome(ctx, queries)
+	})
 
 	r.GET("/tasks", func(ctx *gin.Context) {
 		// retval, err := json.Marshal(tasks)
@@ -62,7 +75,6 @@ func main() {
 			return
 		}
 
-		FetchAndRenderTasks(ctx, queries)
 	})
 
 	r.POST("/add-task", func(ctx *gin.Context) {
@@ -73,18 +85,19 @@ func main() {
 			return
 		}
 
-		if _, err := queries.CreateTask(ctx, todoapp.CreateTaskParams{
+		newTask, err := queries.CreateTask(ctx, todoapp.CreateTaskParams{
 			Name:        form.Name,
 			Description: sql.NullString{String: form.Description, Valid: form.Description != ""},
 			Done:        form.Done,
-		}); err != nil {
+		})
+
+		if err != nil {
 			log.Printf("could not create task %s", err.Error())
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "could not create task"})
 			return
 		}
 
-		FetchAndRenderTasks(ctx, queries)
-
+		FetchAndRenderNewTask(ctx, newTask)
 	})
 
 	r.POST("/update-task", func(ctx *gin.Context) {
@@ -127,7 +140,6 @@ func main() {
 			return
 		}
 
-		FetchAndRenderTasks(ctx, queries)
 	})
 
 	r.POST("/delete-task", func(ctx *gin.Context) {
@@ -173,5 +185,25 @@ func FetchAndRenderTasks(ctx *gin.Context, queries *todoapp.Queries) {
 		log.Printf("could not render tasks %s", err.Error())
 		return
 	}
+	ctx.Data(http.StatusOK, "text/html; charset=utf-8", buf.Bytes())
+}
+
+func FetchAndRenderHome(ctx *gin.Context, queries *todoapp.Queries) {
+	ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte(homePage))
+}
+
+func FetchAndRenderNewTask(ctx *gin.Context, newTask todoapp.Task) {
+	buf := bytes.Buffer{}
+
+	err := generator.TaskTemplate.Render(&buf, &generator.TaskPage{
+		Task: newTask,
+	})
+
+	if err != nil {
+		log.Printf("could not render task %s", err.Error())
+		return
+	}
+
+	println(buf.String())
 	ctx.Data(http.StatusOK, "text/html; charset=utf-8", buf.Bytes())
 }

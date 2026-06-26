@@ -5,3 +5,4 @@ import (
 )
 
 var TasksTemplate = tmpl.MustCompile(&TasksPage{})
+var TaskTemplate = tmpl.MustCompile(&TaskPage{})
