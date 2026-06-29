@@ -134,11 +134,15 @@ func main() {
 			params.Done = v == "true"
 		}
 
-		if _, err = queries.UpdateTask(ctx, params); err != nil {
+		newTask, err := queries.UpdateTask(ctx, params)
+
+		if err != nil {
 			log.Printf("couldnt update task %s", err.Error())
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "could not update task"})
 			return
 		}
+
+		FetchAndRenderNewTask(ctx, newTask)
 
 	})
 

@@ -3,7 +3,7 @@
 	<span class="status {{if .Done}}done{{else}}pending{{end}}">{{if .Done}}✓ done{{else}}○ pending{{end}}</span>
 	<div class="name">{{.Name}}</div>
 	{{if .Description}}<div class="desc">{{.Description}}</div>{{end}}
-	<form class="inline" method="post" action="/update-task">
+	<form class="inline" hx-post="/update-task?id={{.ID}}" hx-swap="outerHTML" hx-target="#task-{{.ID}}">
 		<input type="hidden" name="ID" value="{{.ID}}">
 		<input type="hidden" name="Done" value="{{if .Done}}false{{else}}true{{end}}">
 		<button type="submit">{{if .Done}}Mark pending{{else}}Mark done{{end}}</button>
